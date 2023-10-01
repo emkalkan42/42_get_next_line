@@ -6,7 +6,7 @@
 /*   By: emkalkan <emkalkan@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 10:12:14 by emkalkan          #+#    #+#             */
-/*   Updated: 2023/09/27 15:49:32 by emkalkan         ###   ########.fr       */
+/*   Updated: 2023/10/01 12:35:03 by emkalkan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,56 +52,56 @@ joined for the persistence of the info,
 #include <unistd.h>
 //#include <stdio.h>
 //#include <fcntl.h>
-
+/*Allocate memory for a buffer to read data from the file descriptor
+/Initialize the read_bytes counter
+Continue reading and appending data to left_str until a
+newline is found or EOF is reached
+Read data from the file descriptor into the buffer
+Null-terminate the buffer to make it a valid C string
+Append the buffer's content to the existing data in left_str
+Free the buffer and return the updated left_str */
 char	*ft_read_to_left_str(int fd, char *left_str)
 {
 	char	*buff;
 	int		rd_bytes;
 
-	// Allocate memory for a buffer to read data from the file descriptor
 	buff = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buff)
 		return (NULL);
-	// Initialize the read_bytes counter
 	rd_bytes = 1;
-	// Continue reading and appending data to left_str until a newline is found or EOF is reached
 	while (!ft_strchr(left_str, '\n') && rd_bytes != 0)
 	{
-		// Read data from the file descriptor into the buffer
 		rd_bytes = read(fd, buff, BUFFER_SIZE);
-		if (rd_bytes == -1)
+		if (rd_bytes == -1) 
 		{
 			free(buff);
 			return (NULL);
 		}
-		// Null-terminate the buffer to make it a valid C string
 		buff[rd_bytes] = '\0';
-
-		// Append the buffer's content to the existing data in left_str
 		left_str = ft_strjoin(left_str, buff);
 	}
-	// Free the buffer and return the updated left_str
 	free(buff);
 	return (left_str);
 }
+/*Check for invalid file descriptor or negative BUFFER_SIZE
+Read data from the file descriptor and accumulate it in left_str
+If there's an error during reading, return NULL
+Extract a line from left_str
+Update left_str to remove the extracted line
+Return the extracted line*/
+
 char	*get_next_line(int fd)
 {
 	char		*line;
 	static char	*left_str;
 
-	// Check for invalid file descriptor or negative BUFFER_SIZE
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (0);
-	// Read data from the file descriptor and accumulate it in left_str
 	left_str = ft_read_to_left_str(fd, left_str);
-	// If there's an error during reading, return NULL
 	if (!left_str)
 		return (NULL);
-	// Extract a line from left_str
 	line = ft_get_line(left_str);
-	// Update left_str to remove the extracted line
 	left_str = ft_new_left_str(left_str);
-	// Return the extracted line
 	return (line);
 }
 
